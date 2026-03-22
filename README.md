@@ -19,7 +19,7 @@ We utilize the **Sumopod API** to power our generation engines. By integrating c
 
 To get started:
 
-1. Obtain your API key from [oclite.site/get-key](https://sumopod.com).
+1. Obtain your API key from (<https://sumopod.com>).
 2. Input and save your key securely in the OCGen AI sidebar. It is safely stored in your local VS Code SecretStorage.
 3. Start generating without limits!
 
