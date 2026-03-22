@@ -60,9 +60,10 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
             return;
         }
 
+        const isImage = genType === 'svg' || genType === 'png';
         const viewBox = svgSize.includes('x') ? `0 0 ${svgSize.replace('x', ' ')}` : `0 0 ${svgSize} ${svgSize}`;
         
-        const systemPrompt = genType === 'svg'
+        const systemPrompt = isImage
             ? `You are an expert UI/UX designer. Your ONLY job is to write pure, valid SVG code. Output ONLY the raw <svg> tag and its contents. NO markdown formatting, NO explanations. IMPORTANT: Create HIGH-DEFINITION, detailed SVG with smooth curves and professional quality. Use viewBox='${viewBox}', add multiple paths for depth and detail, use gradients when appropriate, and ensure fill='currentColor' or define beautiful color schemes. Make it look polished and production-ready.`
             : `You are a helpful assistant that generates realistic mock data in JSON format. Based on the user's request, create detailed and realistic mock data. Output valid JSON only (array or object). Include diverse, realistic values with proper data types (strings, numbers, booleans, nested objects). Make the data production-ready and comprehensive.`;
 
@@ -324,6 +325,7 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
         <div class="section-title">Generation Type</div>
         <select id="genType" onchange="toggleSvgOptions()">
             <option value="svg">Generate minimalist SVG Icon</option>
+            <option value="png">Generate minimalist PNG Icon</option>
             <option value="json">Generate realistic JSON Mock Data</option>
         </select>
     </div>
@@ -402,6 +404,28 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
                     const preview = document.getElementById('preview');
                     if (message.genType === 'svg') {
                         preview.innerHTML = message.content;
+                    } else if (message.genType === 'png') {
+                        preview.innerHTML = '<div class="loading">Rendering PNG...</div>';
+                        const svgStr = message.content;
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const img = new Image();
+                        const blob = new Blob([svgStr], {type: 'image/svg+xml;charset=utf-8'});
+                        const url = URL.createObjectURL(blob);
+                        img.onload = () => {
+                            // Extract width/height from SVG or fallback
+                            const sizeMatch = svgStr.match(/viewBox="0 0 (\d+) (\d+)"/);
+                            let w = sizeMatch ? parseInt(sizeMatch[1]) : 256;
+                            let h = sizeMatch ? parseInt(sizeMatch[2]) : 256;
+                            canvas.width = w;
+                            canvas.height = h;
+                            ctx.drawImage(img, 0, 0, w, h);
+                            const pngDataUrl = canvas.toDataURL('image/png');
+                            preview.innerHTML = `<img src="${pngDataUrl}" alt="PNG Preview" style="max-width: 100%; display: block; margin: 0 auto;" />`;
+                            generatedContent = pngDataUrl; 
+                            URL.revokeObjectURL(url);
+                        };
+                        img.src = url;
                     } else {
                         preview.innerHTML = '<pre>' + JSON.stringify(JSON.parse(message.content), null, 2) + '</pre>';
                     }
@@ -436,7 +460,7 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
             if (!prompt) return;
 
             const genType = document.getElementById('genType').value;
-            const svgSize = genType === 'svg' ? document.getElementById('svgSize').value : '24';
+            const svgSize = (genType === 'svg' || genType === 'png') ? document.getElementById('svgSize').value : '24';
 
             document.getElementById('generateBtn').disabled = true;
             document.getElementById('loading').classList.remove('hidden');
@@ -455,7 +479,7 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
         function toggleSvgOptions() {
             const genType = document.getElementById('genType').value;
             const svgSection = document.getElementById('svgSizeSection');
-            if (genType === 'svg') {
+            if (genType === 'svg' || genType === 'png') {
                 svgSection.style.display = 'block';
             } else {
                 svgSection.style.display = 'none';
@@ -473,16 +497,23 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
 
         function downloadFile() {
             const genType = document.getElementById('genType').value;
-            const extension = genType === 'svg' ? 'svg' : 'json';
-            const mimeType = genType === 'svg' ? 'image/svg+xml' : 'application/json';
+            const extension = genType === 'svg' ? 'svg' : (genType === 'png' ? 'png' : 'json');
             
-            const blob = new Blob([generatedContent], { type: mimeType });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'ocgen-' + Date.now() + '.' + extension;
-            a.click();
-            URL.revokeObjectURL(url);
+            if (genType === 'png') {
+                const a = document.createElement('a');
+                a.href = generatedContent;
+                a.download = 'ocgen-' + Date.now() + '.png';
+                a.click();
+            } else {
+                const mimeType = genType === 'svg' ? 'image/svg+xml' : 'application/json';
+                const blob = new Blob([generatedContent], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ocgen-' + Date.now() + '.' + extension;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
         }
 
         // Check key status on load
