@@ -1,0 +1,52 @@
+{
+    "name": "ocgen-ai",
+    "displayName": "OCGen AI",
+    "description": "Generate SVG icons and JSON mock data using AI - BYOK via Sumopod",
+    "version": "1.0.0",
+    "icon": "resources/logo.png",
+    "publisher": "your-publisher-name",
+    "engines": {
+        "vscode": "^1.75.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onView:ocgenView"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "ocgen-sidebar",
+                    "title": "OCGen AI",
+                    "icon": "resources/icon.svg"
+                }
+            ]
+        },
+        "views": {
+            "ocgen-sidebar": [
+                {
+                    "type": "webview",
+                    "id": "ocgenView",
+                    "name": "OCGen AI"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./"
+    },
+    "devDependencies": {
+        "@types/node": "^18.0.0",
+        "@types/vscode": "^1.75.0",
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "node-fetch": "^2.7.0"
+    },
+    "license": "MIT"
+}
