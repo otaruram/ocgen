@@ -7,7 +7,7 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
     constructor(
         private readonly _extensionUri: vscode.Uri,
         private readonly _context: vscode.ExtensionContext
-    ) {}
+    ) { }
 
     public resolveWebviewView(
         webviewView: vscode.WebviewView,
@@ -32,9 +32,9 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
 
                 case 'checkKey':
                     const key = await this._context.secrets.get('sumopodKey');
-                    webviewView.webview.postMessage({ 
-                        type: 'keyStatus', 
-                        hasKey: !!key 
+                    webviewView.webview.postMessage({
+                        type: 'keyStatus',
+                        hasKey: !!key
                     });
                     break;
 
@@ -51,18 +51,18 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
 
     private async _handleGenerate(genType: string, prompt: string, model: string, svgSize: string = '24') {
         const apiKey = await this._context.secrets.get('sumopodKey');
-        
+
         if (!apiKey) {
-            this._view?.webview.postMessage({ 
-                type: 'error', 
-                message: 'Please save your Sumopod API Key first' 
+            this._view?.webview.postMessage({
+                type: 'error',
+                message: 'Please save your Sumopod API Key first'
             });
             return;
         }
 
         const isImage = genType === 'svg' || genType === 'png';
         const viewBox = svgSize.includes('x') ? `0 0 ${svgSize.replace('x', ' ')}` : `0 0 ${svgSize} ${svgSize}`;
-        
+
         const systemPrompt = isImage
             ? `You are an expert UI/UX designer. Your ONLY job is to write pure, valid SVG code. Output ONLY the raw <svg> tag and its contents. NO markdown formatting, NO explanations. IMPORTANT: Create HIGH-DEFINITION, detailed SVG with smooth curves and professional quality. Use viewBox='${viewBox}', add multiple paths for depth and detail, use gradients when appropriate, and ensure fill='currentColor' or define beautiful color schemes. Make it look polished and production-ready.`
             : `You are a helpful assistant that generates realistic mock data in JSON format. Based on the user's request, create detailed and realistic mock data. Output valid JSON only (array or object). Include diverse, realistic values with proper data types (strings, numbers, booleans, nested objects). Make the data production-ready and comprehensive.`;
@@ -98,15 +98,15 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
                 content = content.replace(/^```(?:json|svg)?\n?/, '').replace(/\n?```$/, '');
             }
 
-            this._view?.webview.postMessage({ 
-                type: 'generated', 
+            this._view?.webview.postMessage({
+                type: 'generated',
                 content: content.trim(),
-                genType 
+                genType
             });
         } catch (error: any) {
-            this._view?.webview.postMessage({ 
-                type: 'error', 
-                message: error.message 
+            this._view?.webview.postMessage({
+                type: 'error',
+                message: error.message
             });
         }
     }
@@ -313,7 +313,7 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
         <div id="keyInput">
             <input type="password" id="apiKey" placeholder="Enter your Sumopod API Key">
             <button onclick="saveKey()">Save Key</button>
-            <a href="https://ai.sumopod.com" target="_blank" class="link">Get your API key →</a>
+            <a href="https://sumopod.com" target="_blank" class="link">Get your API key →</a>
         </div>
         <div id="keyStatus" class="hidden status success">
             ✅ Key is set
