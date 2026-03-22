@@ -421,7 +421,7 @@ export class OCGenViewProvider implements vscode.WebviewViewProvider {
                             canvas.height = h;
                             ctx.drawImage(img, 0, 0, w, h);
                             const pngDataUrl = canvas.toDataURL('image/png');
-                            preview.innerHTML = `<img src="${pngDataUrl}" alt="PNG Preview" style="max-width: 100%; display: block; margin: 0 auto;" />`;
+                            preview.innerHTML = '<img src="' + pngDataUrl + '" alt="PNG Preview" style="max-width: 100%; display: block; margin: 0 auto;" />';
                             generatedContent = pngDataUrl; 
                             URL.revokeObjectURL(url);
                         };
