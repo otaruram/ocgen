@@ -4,7 +4,7 @@
     "description": "Generate SVG icons and JSON mock data using AI - BYOK via Sumopod",
     "version": "1.0.0",
     "icon": "resources/logo.png",
-    "publisher": "your-publisher-name",
+    "publisher": "otaruram",
     "engines": {
         "vscode": "^1.75.0"
     },
