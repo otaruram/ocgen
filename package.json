@@ -2,7 +2,7 @@
     "name": "ocgen-ai",
     "displayName": "OCGen AI",
     "description": "Generate SVG icons and JSON mock data using AI - BYOK via Sumopod",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "icon": "resources/logo.png",
     "publisher": "OCGEN",
     "engines": {
@@ -10,6 +10,16 @@
     },
     "categories": [
         "Other"
+    ],
+    "keywords": [
+        "ai",
+        "chatgpt",
+        "svg generator",
+        "png generator",
+        "json mock data",
+        "code assistant",
+        "developer tools",
+        "sumopod"
     ],
     "activationEvents": [
         "onView:ocgenView"
